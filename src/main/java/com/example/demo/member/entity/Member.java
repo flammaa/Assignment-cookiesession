@@ -1,4 +1,4 @@
-package com.example.demo.todo.entity;
+package com.example.demo.member.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,16 +7,21 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Getter
+@Entity
 @NoArgsConstructor
-public class todo {
+public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long todoId;
-    private String content;
 
-    public todo(String content) {
-        this.content = content;
+    private Long memberId;
+    private String email;
+
+    public Member(String email) {
+        this.email = email;
+    }
+
+    public void update(String email) {
+        this.email = email;
     }
 }
