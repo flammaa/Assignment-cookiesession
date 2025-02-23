@@ -69,6 +69,6 @@ public class MemberService {
         if (memberRepository.existsById(memberId)) {
              throw new IllegalArgumentException("해당 회원이 존재하지 않습니다.");
         }
-        memberRepository.deleteById(memberId );
+        memberRepository.deleteById(memberId);
     }
 }
