@@ -1,5 +1,6 @@
 package com.example.demo.member.controller;
 
+import com.example.demo.common.consts.Const;
 import com.example.demo.member.dto.request.MemberSaveRequestDto;
 import com.example.demo.member.dto.request.MemberUpdateRequestDto;
 import com.example.demo.member.dto.response.MemberResponseDto;
@@ -18,10 +19,6 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @PostMapping
-    public ResponseEntity<MemberSaveResponseDto> save(@RequestBody MemberSaveRequestDto dto) {
-        return ResponseEntity.ok(memberService.save(dto))  ;
-    }
 
     @GetMapping
     public ResponseEntity<List<MemberResponseDto>> getAll() {
@@ -30,16 +27,21 @@ public class MemberController {
 
     @GetMapping("/{memberId}")
     public ResponseEntity<MemberResponseDto> getOne(@PathVariable Long memberId) {
-        return ResponseEntity.ok(memberService.findById(memberId ));
+        return ResponseEntity.ok(memberService.findById(memberId));
     }
 
     @PutMapping("/{memberId}")
-    public void update(@PathVariable Long memberId, @RequestBody MemberUpdateRequestDto dto) {
+    public void update(
+            @SessionAttribute(name = Const.LOGIN_MEMBER) Long memberId,
+            @RequestBody MemberUpdateRequestDto dto
+    ) {
         memberService.update(memberId, dto);
     }
 
-    @DeleteMapping("/{memberId}")
-    public void delete(@PathVariable Long memberId) {
+    @DeleteMapping
+    public void delete(
+            @SessionAttribute(name = Const.LOGIN_MEMBER) Long memberId
+    ) {
         memberService.deleteById(memberId);
     }
 }

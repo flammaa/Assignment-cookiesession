@@ -20,33 +20,14 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    @Transactional
-    public MemberSaveResponseDto save(MemberSaveRequestDto dto) {
-
-        Member member = new Member(dto.getEmail());
-
-        Member savedMember = memberRepository.save(member);
-
-        return new MemberSaveResponseDto(
-                savedMember.getMemberId(),
-                savedMember.getEmail()
-        );
-    }
 
     @Transactional(readOnly = true)
     public List<MemberResponseDto> findAll() {
         List<Member> members = memberRepository.findAll();
 
-//        List<MemberResponseDto> dtos = new ArrayList<>();
-//        for (Member member : members) {
-//            dtos.add(new MemberResponseDto(
-//                    Member.getMemberId(),
-//                    Member.getEmail()
-//            ));
-//        }
-//        return dtos;
-        return  members.stream().map(
-                member -> new MemberResponseDto(member.getMemberId(), member.getEmail())). toList();
+        return  members
+                .stream()
+                .map(member -> new MemberResponseDto(member.getMemberId(), member.getEmail())).toList();
     }
 
     @Transactional(readOnly = true)

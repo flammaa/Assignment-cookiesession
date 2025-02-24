@@ -1,5 +1,6 @@
 package com.example.demo.todo.controller;
 
+import com.example.demo.common.consts.Const;
 import com.example.demo.todo.dto.request.TodoSaveRequestDto;
 import com.example.demo.todo.dto.request.TodoUpdateRequestDto;
 import com.example.demo.todo.dto.response.TodoResponseDto;
@@ -20,8 +21,11 @@ public class TodoController {
     private final TodoService todoService;
 
     @PostMapping
-    public ResponseEntity<TodoSaveResponseDto> save(@RequestBody TodoSaveRequestDto dto) {
-        return ResponseEntity.ok(todoService.save(dto));
+    public ResponseEntity<TodoSaveResponseDto> save(
+            @SessionAttribute(name = Const.LOGIN_MEMBER) Long memberId,
+            @RequestBody TodoSaveRequestDto dto
+    ) {
+        return ResponseEntity.ok(todoService.save(memberId, dto));
     }
 
     @GetMapping
@@ -35,12 +39,18 @@ public class TodoController {
     }
 
     @PutMapping("/{todoId}")
-    public ResponseEntity<TodoUpdateResponseDto> update(@PathVariable Long todoId, @RequestBody TodoUpdateRequestDto dto) {
-        return ResponseEntity.ok(todoService.update(todoId, dto));
+    public ResponseEntity<TodoUpdateResponseDto> update(
+            @SessionAttribute(name = Const.LOGIN_MEMBER) Long memberId,
+            @PathVariable Long todoId,
+            @RequestBody TodoUpdateRequestDto dto) {
+        return ResponseEntity.ok(todoService.update(memberId, todoId, dto));
     }
 
     @DeleteMapping("/{todoId}")
-    public void delete(@PathVariable Long todoId) {
-        todoService.deleteById(todoId);
+    public void delete(
+            @SessionAttribute(name = Const.LOGIN_MEMBER) Long memberId,
+            @PathVariable Long todoId
+    ) {
+        todoService.deleteById(memberId, todoId);
     }
 }

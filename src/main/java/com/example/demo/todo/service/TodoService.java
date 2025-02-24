@@ -1,5 +1,7 @@
 package com.example.demo.todo.service;
 
+import com.example.demo.member.entity.Member;
+import com.example.demo.member.repository.MemberRepository;
 import com.example.demo.todo.dto.request.TodoSaveRequestDto;
 import com.example.demo.todo.dto.request.TodoUpdateRequestDto;
 import com.example.demo.todo.dto.response.TodoResponseDto;
@@ -18,14 +20,26 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TodoService {
     private final TodoRepository todoRepository;
+    private final MemberRepository memberRepository;
+
 
     @Transactional
-    public TodoSaveResponseDto save(TodoSaveRequestDto dto) {
-        Todo todo = new Todo(dto.getContent());
+    public TodoSaveResponseDto save(Long memberId, TodoSaveRequestDto dto) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new IllegalStateException("멤버가 없습니다.")
+        );
+
+        Todo todo = new Todo(
+                dto.getContent(),
+                member
+        );
+
         Todo savedTodo = todoRepository.save(todo);
         return new TodoSaveResponseDto(
                 savedTodo.getTodoId(),
-                savedTodo.getContent()
+                savedTodo.getContent(),
+                member.getMemberId(),
+                member.getEmail()
         );
     }
 
@@ -54,10 +68,20 @@ public class TodoService {
     }
 
     @Transactional
-    public TodoUpdateResponseDto update(Long todoId, TodoUpdateRequestDto dto) {
+    public TodoUpdateResponseDto update(Long memberId, Long todoId, TodoUpdateRequestDto dto) {
+
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new IllegalStateException("멤버가 존재하지 않습니다.")
+        );
+
         Todo todo = todoRepository.findById(todoId).orElseThrow(
                 () -> new IllegalStateException("일정이 존재하지 않습니다.")
         );
+
+        if (!todo.getMember().getMemberId().equals(member.getMemberId())) {
+            throw new IllegalStateException("아이디가 일치하지 않습니다.");
+        }
+
         todo.update(dto.getContent());
         return new TodoUpdateResponseDto(
                 todo.getTodoId(),
@@ -66,10 +90,19 @@ public class TodoService {
     }
 
     @Transactional
-    public void deleteById(Long todoId) {
-        if (!todoRepository.existsById(todoId)) {
-            throw new IllegalStateException("일정이 존재하지 않습니다.");
+    public void deleteById(Long memberId, Long todoId) {
+
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new IllegalStateException("멤버가 존재하지 않습니다.")
+        );
+
+        Todo todo = todoRepository.findById(todoId).orElseThrow(
+                () -> new IllegalStateException("일정이 존재하지 않습니다.")
+        );
+        if (!todo.getMember().getMemberId().equals(member.getMemberId())) {
+            throw new IllegalStateException("아이디가 일치하지 않습니다.");
         }
+
         todoRepository.deleteById(todoId);
     }
 }
